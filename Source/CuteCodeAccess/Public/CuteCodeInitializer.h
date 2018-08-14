@@ -41,11 +41,12 @@ public:
 
 private:
 	void CreateProFile() const;
+	void CreatePriFiles() const;
 
 	FString SolutionPath;
 	FString ProjectName;
 
 	FCuteCodeFastXmlCallback* FastXmlCallback;
 
-	void AppendFileNames(TArray<FString>& Array, const TArray<FString>& ToAppend) const;
+	void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
 };
