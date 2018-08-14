@@ -1,11 +1,11 @@
 #include "CuteCodeInitializer.h"
+#include "CuteCodeConstants.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 
 #define LOCTEXT_NAMESPACE "FCuteCodeInitializer"
-
 
 bool FCuteCodeFastXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
 {
@@ -61,7 +61,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
 
 	FString VcxProjFile = FPaths::Combine(
 		SolutionPath, 
-		TEXT("Intermediate/ProjectFiles"),
+		INTERMEDIATE_PROJECTFILES,
 		ProjectName + TEXT(".vcxproj")
 	);
 
@@ -117,7 +117,7 @@ void FCuteCodeInitializer::CreateProFile() const
 
 	FString ProFilePath = FPaths::Combine(
 		SolutionPath,
-		TEXT("Intermediate/ProjectFiles"),
+		INTERMEDIATE_PROJECTFILES,
 		ProjectName + ".pro"
 	);
 

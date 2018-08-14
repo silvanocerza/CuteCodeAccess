@@ -1,6 +1,7 @@
 #include "CuteCodeAccessor.h"
 #include "CuteCodeAccessModule.h"
 #include "CuteCodeInitializer.h"
+#include "CuteCodeConstants.h"
 #include "Developer/SourceCodeAccess/Public/ISourceCodeAccessModule.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Modules/ModuleManager.h"
@@ -17,8 +18,6 @@
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeAccessor, Log, All);
 
 #define LOCTEXT_NAMESPACE "FCuteCodeAccessor"
-#define INTERMEDIATE_PROJECTFILES TEXT("Intermediate\\ProjectFiles")
-
 
 static FString MakePath(const FString& InPath)
 {
