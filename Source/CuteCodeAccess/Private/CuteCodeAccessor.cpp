@@ -32,8 +32,20 @@ FString FCuteCodeAccessor::GetSolutionPath() const
 	if (IsInGameThread())
 	{
 		CachedSolutionPath = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir());
-		
-		// TODO: Here initialize pro files if necessary
+
+		// Get project file path
+		FString ProjectFile = FPaths::Combine(
+			FPaths::ProjectDir(),
+			INTERMEDIATE_PROJECTFILES,
+			FApp::GetProjectName() + FString(".pro")
+		);
+
+		// Creates project files if necessary
+		if (!FPaths::FileExists(ProjectFile))
+		{
+			FCuteCodeInitializer Initializer{FPaths::ProjectDir(), FApp::GetProjectName()};
+			Initializer.Run();
+		}
 	}
 
 	return CachedSolutionPath;
