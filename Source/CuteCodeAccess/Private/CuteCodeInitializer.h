@@ -2,34 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericPlatformFile.h"
-#include "Runtime/XmlParser/Public/FastXml.h"
-
-class FCuteCodeFastXmlCallback : public IFastXmlCallback
-{
-public:
-	FCuteCodeFastXmlCallback() {};
-	virtual ~FCuteCodeFastXmlCallback() {};
-
-	bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override;
-	bool ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber) override;
-	bool ProcessClose(const TCHAR* Element) override;
-	bool ProcessComment(const TCHAR* Comment) override;
-	bool ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber) override;
-
-	// Getters
-	FString GetDefines() const { return Defines; };
-	FString GetIncludes() const { return Includes;  };
-	TArray<FString> GetSources() const { return Sources; };
-	TArray<FString> GetHeaders() const { return Headers; };
-
-private:
-	FString CurrentElementName = "";
-
-	FString Defines;
-	FString Includes;
-	TArray<FString> Sources;
-	TArray<FString> Headers;
-};
+#include "CuteCodeXmlCallbacks.h"
 
 class FCuteCodeInitializer
 {
@@ -46,7 +19,7 @@ private:
 	FString SolutionPath;
 	FString ProjectName;
 
-	FCuteCodeFastXmlCallback* FastXmlCallback;
+	FCuteCodeVCProjXmlCallback* FastXmlCallback;
 
 	void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
 };

@@ -2,59 +2,16 @@
 #include "CuteCodeConstants.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Runtime/XmlParser/Public/FastXml.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 
 #define LOCTEXT_NAMESPACE "FCuteCodeInitializer"
 
-bool FCuteCodeFastXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
-{
-	if (CurrentElementName == "ClCompile" && AttributeName == FString{"Include"}) 
-	{
-		Sources.Add(AttributeValue);
-	}
-	else if (CurrentElementName == "ClInclude" && AttributeName == FString{"Include"})
-	{
-		Headers.Add(AttributeValue);
-	}
-	return true;
-}
-
-bool FCuteCodeFastXmlCallback::ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber)
-{
-	CurrentElementName = ElementName;
-
-	if (CurrentElementName == "NMakePreprocessorDefinitions")
-	{
-		Defines = ElementData;
-	}
-	else if (CurrentElementName == "NMakeIncludeSearchPath")
-	{
-		Includes = ElementData;
-	}
-	return true;
-}
-
-bool FCuteCodeFastXmlCallback::ProcessClose(const TCHAR* Element)
-{
-	CurrentElementName = "";
-	return true;
-}
-
-bool FCuteCodeFastXmlCallback::ProcessComment(const TCHAR* Comment)
-{
-	return true;
-}
-
-bool FCuteCodeFastXmlCallback::ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber)
-{
-	return true;
-}
-
 FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FString& ProjectName)
 	: SolutionPath{SolutionPath}
 	, ProjectName{ProjectName}
-	, FastXmlCallback{new FCuteCodeFastXmlCallback}
+	, FastXmlCallback{new FCuteCodeVCProjXmlCallback}
 {
 	FText OutErrorMessage;
 	int32 OutErrorLineNumber = -1;
