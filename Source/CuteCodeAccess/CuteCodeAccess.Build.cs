@@ -10,6 +10,8 @@ namespace UnrealBuildTool.Rules
                 new string[]
                 {
                     "Core",
+                    "CoreUObject",
+                    "Engine",
                     "SourceCodeAccess",
                     "DesktopPlatform",
                     "XmlParser",

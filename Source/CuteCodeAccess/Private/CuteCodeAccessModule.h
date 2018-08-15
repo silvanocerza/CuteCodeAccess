@@ -15,6 +15,10 @@ public:
 
 	FCuteCodeAccessor& GetAccessor();
 
+protected:
+	void RegisterSettings();
+	void UnregisterSettings();
+
 private:
 
 	TSharedRef<FCuteCodeAccessor> CuteCodeAccessor;
