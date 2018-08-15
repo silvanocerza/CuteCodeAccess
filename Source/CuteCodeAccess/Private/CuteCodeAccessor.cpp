@@ -2,6 +2,7 @@
 #include "CuteCodeAccessModule.h"
 #include "CuteCodeInitializer.h"
 #include "CuteCodeConstants.h"
+#include "CuteCodeEditorSettings.h"
 #include "Developer/SourceCodeAccess/Public/ISourceCodeAccessModule.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Modules/ModuleManager.h"
@@ -65,25 +66,42 @@ void FCuteCodeAccessor::Startup()
 
 void FCuteCodeAccessor::RefreshAvailability()
 {
-	FString IDEPath;
+	const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
 
-	FWindowsPlatformMisc::QueryRegKey(HKEY_CURRENT_USER, TEXT("SOFTWARE\\Classes\\Applications\\QtProject.QtCreator.pro\\shell\\Open\\Command"), TEXT(""), IDEPath);
+	FString URL;
 
-	FString PatternString(TEXT("(.*) -"));
-	FRegexPattern Pattern(PatternString);
-	FRegexMatcher Matcher(Pattern, IDEPath);
-
-	if (Matcher.FindNext())
+	// If user has set a specific Qt Creator path use that, otherwise search it
+	if (Settings && !Settings->QtCreatorPath.FilePath.IsEmpty())
 	{
-		FString URL = Matcher.GetCaptureGroup(1);
+		URL = Settings->QtCreatorPath.FilePath;
+	}
+	else
+	{
+		FString IDEPath;
 
-		if (FPaths::FileExists(URL))
+		FWindowsPlatformMisc::QueryRegKey(
+			HKEY_CURRENT_USER,
+			TEXT("SOFTWARE\\Classes\\Applications\\QtProject.QtCreator.pro\\shell\\Open\\Command"),
+			TEXT(""),
+			IDEPath
+		);
+
+		FRegexPattern Pattern("(.*) -");
+		FRegexMatcher Matcher(Pattern, IDEPath);
+
+		if (Matcher.FindNext())
 		{
-			Location.URL = URL;
-			UE_LOG(LogCuteCodeAccessor, Log, TEXT("Qt Creator found at \"%s\""), *URL);
-			return;
+			URL = Matcher.GetCaptureGroup(1);
 		}
 	}
+
+	if (!URL.IsEmpty() && FPaths::FileExists(URL))
+	{
+		Location.URL = FPaths::ConvertRelativePathToFull(URL);
+		UE_LOG(LogCuteCodeAccessor, Log, TEXT("Qt Creator found at \"%s\""), *URL);
+		return;
+	}
+
 	UE_LOG(LogCuteCodeAccessor, Error, TEXT("Qt Creator not found"));
 }
 
