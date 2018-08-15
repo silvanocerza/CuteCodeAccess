@@ -15,6 +15,7 @@ public:
 private:
 	void CreateProFile() const;
 	void CreatePriFiles() const;
+	void CreateProUserFile() const;
 
 	FString SolutionPath;
 	FString ProjectName;

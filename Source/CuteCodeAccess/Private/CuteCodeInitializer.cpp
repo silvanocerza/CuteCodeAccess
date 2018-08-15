@@ -1,8 +1,10 @@
 #include "CuteCodeInitializer.h"
 #include "CuteCodeConstants.h"
+#include "CuteCodeEditorSettings.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Runtime/XmlParser/Public/FastXml.h"
+#include "Windows/WindowsPlatformMisc.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 
@@ -49,6 +51,7 @@ void FCuteCodeInitializer::Run() const
 {
 	CreateProFile();
 	CreatePriFiles();
+	CreateProUserFile();
 }
 
 void FCuteCodeInitializer::CreateProFile() const
@@ -132,6 +135,45 @@ void FCuteCodeInitializer::CreatePriFiles() const
 	);
 
 	FFileHelper::SaveStringArrayToFile(IncludesPriLines, *IncludePriFilePaths);
+}
+
+void FCuteCodeInitializer::CreateProUserFile() const
+{
+	const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
+
+	if (Settings)
+	{
+		if (Settings->UnrealConfigurationName.IsEmpty())
+		{
+			UE_LOG(LogCuteCodeInitializer, Error,
+				TEXT("Unreal configuration name must be set to create project files correctly"));
+			return;
+		}
+
+		// Gets current user Roaming folder to find Qt Creator configurations
+		int32 EnvVarLen = 512;
+		TCHAR* EnvVar = new TCHAR[EnvVarLen];
+		FWindowsPlatformMisc::GetEnvironmentVariable(TEXT("APPDATA"), EnvVar, EnvVarLen);
+
+		FString RoamingDirectory = FString{ EnvVar };
+
+		FString QtCreatorConfigutionFile = FPaths::Combine(
+			FString{ EnvVar },
+			FString{ "QtProject/qtcreator/profiles.xml" }
+		);
+
+		FPaths::NormalizeDirectoryName(QtCreatorConfigutionFile);
+
+		if (FPaths::FileExists(QtCreatorConfigutionFile))
+		{
+			// TODO: Here parse xml and find configuration uuid
+		}
+		else
+		{
+			UE_LOG(LogCuteCodeInitializer, Error, TEXT("\"%s\" not found"), *QtCreatorConfigutionFile);
+			return;
+		}
+	}
 }
 
 void FCuteCodeInitializer::AppendFormattedStrings(TArray<FString>& OutArray, const FString& Formatter, const TArray<FString>& ToAppend) const
