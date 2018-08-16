@@ -15,5 +15,5 @@ public:
 	FFilePath QtCreatorPath;
 
 	UPROPERTY(config, EditAnywhere)
-	FString UnrealConfigurationName;
+	FString UnrealKitName;
 };

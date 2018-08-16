@@ -2,6 +2,6 @@
 
 UCuteCodeEditorSettings::UCuteCodeEditorSettings()
 	: QtCreatorPath{ "" }
-	, UnrealConfigurationName{ "" }
+	, UnrealKitName{ "" }
 {
 };

@@ -6,7 +6,7 @@
 class FCuteCodeVCProjXmlCallback : public IFastXmlCallback
 {
 public:
-	FCuteCodeVCProjXmlCallback() {};
+	FCuteCodeVCProjXmlCallback();
 	virtual ~FCuteCodeVCProjXmlCallback() {};
 
 	bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override;
@@ -22,10 +22,33 @@ public:
 	TArray<FString> GetHeaders() const { return Headers; };
 
 private:
-	FString CurrentElementName = "";
+	FString CurrentElementName;
 
 	FString Defines;
 	FString Includes;
 	TArray<FString> Sources;
 	TArray<FString> Headers;
+};
+
+/// Callback used when parsing Qt Creator profiles.xml
+class FCuteCodeProfilesXmlCallback : public IFastXmlCallback
+{
+public:
+	FCuteCodeProfilesXmlCallback();
+	virtual ~FCuteCodeProfilesXmlCallback() {};
+
+	bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override;
+	bool ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber) override;
+	bool ProcessClose(const TCHAR* Element) override;
+	bool ProcessComment(const TCHAR* Comment) override;
+	bool ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber) override;
+
+	FString GetKitUuid() const { return KitUuid; }
+
+private:
+	FString CurrentElementData;
+	FString CurrentElement;
+	
+	FString KitUuid;
+	FString ExpectedKitName;
 };

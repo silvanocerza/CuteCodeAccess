@@ -13,7 +13,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FString& ProjectName)
 	: SolutionPath{SolutionPath}
 	, ProjectName{ProjectName}
-	, FastXmlCallback{new FCuteCodeVCProjXmlCallback}
+	, VCProjXmlCallback{new FCuteCodeVCProjXmlCallback}
 {
 	FText OutErrorMessage;
 	int32 OutErrorLineNumber = -1;
@@ -25,7 +25,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
 	);
 
 	FFastXml::ParseXmlFile(
-		FastXmlCallback,
+		VCProjXmlCallback,
 		*VcxProjFile,
 		TEXT(""),
 		nullptr,
@@ -44,7 +44,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
 
 FCuteCodeInitializer::~FCuteCodeInitializer()
 {
-	delete FastXmlCallback;
+	delete VCProjXmlCallback;
 }
 
 void FCuteCodeInitializer::Run() const
@@ -68,16 +68,16 @@ void FCuteCodeInitializer::CreateProFile() const
 	}};
 
 	ProFileLines.Add("HEADERS += \\");
-	AppendFormattedStrings(ProFileLines, "{0} \\", FastXmlCallback->GetHeaders());
+	AppendFormattedStrings(ProFileLines, "{0} \\", VCProjXmlCallback->GetHeaders());
 	ProFileLines.Pop();
-	ProFileLines.Add(FString::Format(TEXT("{0}"), { FastXmlCallback->GetHeaders().Last() }));
+	ProFileLines.Add(FString::Format(TEXT("{0}"), { VCProjXmlCallback->GetHeaders().Last() }));
 
 	ProFileLines.Add("");
 
 	ProFileLines.Add("SOURCES += \\");
-	AppendFormattedStrings(ProFileLines, "{0} \\", FastXmlCallback->GetSources());
+	AppendFormattedStrings(ProFileLines, "{0} \\", VCProjXmlCallback->GetSources());
 	ProFileLines.Pop();
-	ProFileLines.Add(FString::Format(TEXT("{0}"), { FastXmlCallback->GetSources().Last() }));
+	ProFileLines.Add(FString::Format(TEXT("{0}"), { VCProjXmlCallback->GetSources().Last() }));
 
 	FString ProFilePath = FPaths::Combine(
 		SolutionPath,
@@ -98,7 +98,7 @@ void FCuteCodeInitializer::CreatePriFiles() const
 	}};
 
 	TArray<FString> Defines;
-	FastXmlCallback->GetDefines().ParseIntoArray(Defines, TEXT(";"), true);
+	VCProjXmlCallback->GetDefines().ParseIntoArray(Defines, TEXT(";"), true);
 
 	DefinesPriLines.Add("DEFINES += \\");
 	AppendFormattedStrings(DefinesPriLines, "\"{0}\" \\", Defines);
@@ -121,7 +121,7 @@ void FCuteCodeInitializer::CreatePriFiles() const
 	}};
 
 	TArray<FString> Includes;
-	FastXmlCallback->GetIncludes().ParseIntoArray(Includes, TEXT(";"), true);
+	VCProjXmlCallback->GetIncludes().ParseIntoArray(Includes, TEXT(";"), true);
 
 	IncludesPriLines.Add("INCLUDEPATH += \\");
 	AppendFormattedStrings(IncludesPriLines, "\"{0}\" \\", Includes);
@@ -143,10 +143,10 @@ void FCuteCodeInitializer::CreateProUserFile() const
 
 	if (Settings)
 	{
-		if (Settings->UnrealConfigurationName.IsEmpty())
+		if (Settings->UnrealKitName.IsEmpty())
 		{
 			UE_LOG(LogCuteCodeInitializer, Error,
-				TEXT("Unreal configuration name must be set to create project files correctly"));
+				TEXT("Unreal kit name must be set to create project files correctly"));
 			return;
 		}
 
@@ -157,21 +157,57 @@ void FCuteCodeInitializer::CreateProUserFile() const
 
 		FString RoamingDirectory = FString{ EnvVar };
 
-		FString QtCreatorConfigutionFile = FPaths::Combine(
+		FString QtCreatorProfileXmlFile = FPaths::Combine(
 			FString{ EnvVar },
 			FString{ "QtProject/qtcreator/profiles.xml" }
 		);
 
-		FPaths::NormalizeDirectoryName(QtCreatorConfigutionFile);
+		FPaths::NormalizeDirectoryName(QtCreatorProfileXmlFile);
 
-		if (FPaths::FileExists(QtCreatorConfigutionFile))
+		if (FPaths::FileExists(QtCreatorProfileXmlFile))
 		{
 			// TODO: Here parse xml and find configuration uuid
+			FCuteCodeProfilesXmlCallback ProfileXmlCallback{};
+
+			FText OutErrorMessage;
+			int32 OutErrorLineNumber = -1;
+
+			// Reads profile.xml
+			TArray<FString> QtCreatorProfileXmlLines;
+			FFileHelper::LoadFileToStringArray(
+				QtCreatorProfileXmlLines,
+				*QtCreatorProfileXmlFile
+			);
+
+			// Removes first 3 lines from profile.xml, because FastXml doesn't
+			// parse them correctly and messes up the rest of the file
+			QtCreatorProfileXmlLines.RemoveAt(0, 3);
+
+			FString JoinedLines = FString::Join(QtCreatorProfileXmlLines, TEXT("\n"));
+
+			FFastXml::ParseXmlFile(
+				&ProfileXmlCallback,
+				TEXT(""),
+				&JoinedLines[0],
+				nullptr,
+				false,
+				false,
+				OutErrorMessage,
+				OutErrorLineNumber
+			);
+
+			UE_LOG(LogCuteCodeInitializer, Error, TEXT("uuid: %s"), *ProfileXmlCallback.GetKitUuid());
+
+			if (!OutErrorMessage.IsEmpty()
+				&& OutErrorMessage.ToString() != "User aborted the parsing process")
+			{
+				UE_LOG(LogCuteCodeInitializer, Error, TEXT("Error parsing profiles.xml file at line: %d %s"),
+					OutErrorLineNumber, *OutErrorMessage.ToString());
+			}
 		}
 		else
 		{
-			UE_LOG(LogCuteCodeInitializer, Error, TEXT("\"%s\" not found"), *QtCreatorConfigutionFile);
-			return;
+			UE_LOG(LogCuteCodeInitializer, Error, TEXT("\"%s\" not found"), *QtCreatorProfileXmlFile);
 		}
 	}
 }

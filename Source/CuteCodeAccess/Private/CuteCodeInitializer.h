@@ -20,7 +20,7 @@ private:
 	FString SolutionPath;
 	FString ProjectName;
 
-	FCuteCodeVCProjXmlCallback* FastXmlCallback;
+	FCuteCodeVCProjXmlCallback* VCProjXmlCallback;
 
 	void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
 };

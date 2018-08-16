@@ -1,6 +1,15 @@
 #include "CuteCodeXmlCallbacks.h"
+#include "CuteCodeEditorSettings.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogCuteXmlCallbacks, Log, All);
 
 #define LOCTEXT_NAMESPACE "FCuteCodeXmlCallbacks"
+
+FCuteCodeVCProjXmlCallback::FCuteCodeVCProjXmlCallback()
+	: CurrentElementName{""}
+{
+
+}
 
 bool FCuteCodeVCProjXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
 {
@@ -42,6 +51,56 @@ bool FCuteCodeVCProjXmlCallback::ProcessComment(const TCHAR* Comment)
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber)
+{
+	return true;
+}
+
+FCuteCodeProfilesXmlCallback::FCuteCodeProfilesXmlCallback()
+	: CurrentElementData{ "" }
+{
+	const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
+
+	if (Settings)
+	{
+		ExpectedKitName = Settings->UnrealKitName;
+	}
+}
+
+bool FCuteCodeProfilesXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
+{
+	if (AttributeName == FString{"key"} && AttributeValue == FString{"PE.Profile.Id"})
+	{
+		KitUuid = CurrentElementData;
+	}
+	else if (AttributeName == FString{"key"}
+		&& AttributeValue == FString{"PE.Profile.Name"}
+		&& CurrentElementData == ExpectedKitName)
+	{
+		// We found our kit, no need to parse the rest of the file
+		return false;
+	}
+	return true;
+}
+
+bool FCuteCodeProfilesXmlCallback::ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber)
+{
+	CurrentElementData = ElementData;
+	CurrentElement = ElementName;
+	return true;
+}
+
+bool FCuteCodeProfilesXmlCallback::ProcessClose(const TCHAR* Element)
+{
+	CurrentElementData = "";
+	return true;
+}
+
+bool FCuteCodeProfilesXmlCallback::ProcessComment(const TCHAR* Comment)
+{
+	return true;
+}
+
+bool FCuteCodeProfilesXmlCallback::ProcessXmlDeclaration(const TCHAR* ElementData, int32 XmlFileLineNumber)
 {
 	return true;
 }
