@@ -5,6 +5,7 @@
 #include "Misc/Paths.h"
 #include "Runtime/XmlParser/Public/FastXml.h"
 #include "Windows/WindowsPlatformMisc.h"
+#include "IPluginManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 
@@ -196,14 +197,43 @@ void FCuteCodeInitializer::CreateProUserFile() const
 				OutErrorLineNumber
 			);
 
-			UE_LOG(LogCuteCodeInitializer, Error, TEXT("uuid: %s"), *ProfileXmlCallback.GetKitUuid());
-
+			// Parsing is interrupted as soon as the Kit UUID is found, for some reason
+			// that counts as an error so checks for that too
 			if (!OutErrorMessage.IsEmpty()
 				&& OutErrorMessage.ToString() != "User aborted the parsing process")
 			{
 				UE_LOG(LogCuteCodeInitializer, Error, TEXT("Error parsing profiles.xml file at line: %d %s"),
 					OutErrorLineNumber, *OutErrorMessage.ToString());
+				return;
 			}
+
+			// Gets the templated pro.user file to configure build environment
+			FString ContentDir = IPluginManager::Get().FindPlugin(TEXT("CuteCodeAccess"))->GetContentDir();
+			FString ProjectProUserContent;
+			FFileHelper::LoadFileToString(ProjectProUserContent, *(ContentDir / "project.pro.user"));
+
+			const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
+
+			// Formats the pro.user file with correct values
+			ProjectProUserContent = FString::Format(
+				*ProjectProUserContent,
+				TMap<FString, FStringFormatArg>{
+					{"SOLUTION_PATH", FPaths::ConvertRelativePathToFull(SolutionPath)},
+					{"PROJECT_NAME", ProjectName},
+					{"UNREAL_ENGINE_DIRECTORY", FPaths::ConvertRelativePathToFull(FPaths::EngineDir())},
+					{"UNREAL_KIT_NAME", Settings->UnrealKitName},
+					{"UNREAL_KIT_UUID", ProfileXmlCallback.GetKitUuid()}
+				}
+			);
+
+			// Saves generated pro.user file
+			FString ProjectProUserPath = FPaths::Combine(
+				SolutionPath,
+				INTERMEDIATE_PROJECTFILES,
+				ProjectName + FString{ ".pro.user" }
+			);
+
+			FFileHelper::SaveStringToFile(ProjectProUserContent, *ProjectProUserPath);
 		}
 		else
 		{

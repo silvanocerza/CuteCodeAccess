@@ -15,6 +15,7 @@ namespace UnrealBuildTool.Rules
                     "SourceCodeAccess",
                     "DesktopPlatform",
                     "XmlParser",
+                    "Projects",
                 }
             );
 
