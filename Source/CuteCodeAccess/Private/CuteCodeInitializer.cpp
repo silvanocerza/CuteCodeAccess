@@ -102,6 +102,14 @@ void FCuteCodeInitializer::CreatePriFiles() const
     VCProjXmlCallback->GetDefines().ParseIntoArray(Defines, TEXT(";"), true);
 
     DefinesPriLines.Add("DEFINES += \\");
+
+    // This is an ugly hack to stop the UCLASS macro from generating code
+    // that is only generated when UE_BUILD_DOCS and __INTELLISENSE__ are not
+    // defined.
+    // That generated code prevents Qt Creator from correctly parsing a class
+    // making harder to navigate code and shows several errors, this solution
+    // solves that without returning errors during compilation
+    DefinesPriLines.Add("\"__INTELLISENSE__=1\" \\");
     AppendFormattedStrings(DefinesPriLines, "\"{0}\" \\", Defines);
     DefinesPriLines.Pop();
     DefinesPriLines.Add(FString::Format(TEXT("\"{0}\""), { Defines.Last() }));

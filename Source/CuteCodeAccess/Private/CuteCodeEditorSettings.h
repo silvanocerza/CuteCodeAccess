@@ -10,6 +10,7 @@ class UCuteCodeEditorSettings : public UObject
     GENERATED_BODY()
 public:
     UCuteCodeEditorSettings();
+    virtual ~UCuteCodeEditorSettings() {}
 
     UPROPERTY(config, EditAnywhere, meta = (FilePathFilter = "exe"))
     FFilePath QtCreatorPath;
