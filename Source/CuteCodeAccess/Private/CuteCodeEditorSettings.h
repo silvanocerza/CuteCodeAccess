@@ -7,13 +7,13 @@
 UCLASS(config=Editor)
 class UCuteCodeEditorSettings : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 public:
-	UCuteCodeEditorSettings();
+    UCuteCodeEditorSettings();
 
-	UPROPERTY(config, EditAnywhere, meta = (FilePathFilter = "exe"))
-	FFilePath QtCreatorPath;
+    UPROPERTY(config, EditAnywhere, meta = (FilePathFilter = "exe"))
+    FFilePath QtCreatorPath;
 
-	UPROPERTY(config, EditAnywhere)
-	FString UnrealKitName;
+    UPROPERTY(config, EditAnywhere)
+    FString UnrealKitName;
 };

@@ -10,58 +10,58 @@ IMPLEMENT_MODULE(FCuteCodeAccessModule, CuteCodeAccess);
 #define LOCTEXT_NAMESPACE "FCuteCodeAccessModule"
 
 FCuteCodeAccessModule::FCuteCodeAccessModule()
-	: CuteCodeAccessor(MakeShareable(new FCuteCodeAccessor()))
+    : CuteCodeAccessor(MakeShareable(new FCuteCodeAccessor()))
 {
 }
 
 void FCuteCodeAccessModule::StartupModule()
 {
-	RegisterSettings();
+    RegisterSettings();
 
-	CuteCodeAccessor->Startup();
+    CuteCodeAccessor->Startup();
 
-	// Bind our source control provider to the editor
-	IModularFeatures::Get().RegisterModularFeature(TEXT("SourceCodeAccessor"), &CuteCodeAccessor.Get());
+    // Bind our source control provider to the editor
+    IModularFeatures::Get().RegisterModularFeature(TEXT("SourceCodeAccessor"), &CuteCodeAccessor.Get());
 }
 
 void FCuteCodeAccessModule::ShutdownModule()
 {
-	UnregisterSettings();
+    UnregisterSettings();
 
-	// unbind provider from editor
-	IModularFeatures::Get().UnregisterModularFeature(TEXT("SourceCodeAccessor"), &CuteCodeAccessor.Get());
+    // unbind provider from editor
+    IModularFeatures::Get().UnregisterModularFeature(TEXT("SourceCodeAccessor"), &CuteCodeAccessor.Get());
 
-	CuteCodeAccessor->Shutdown();
+    CuteCodeAccessor->Shutdown();
 }
 
 FCuteCodeAccessor& FCuteCodeAccessModule::GetAccessor()
 {
-	return CuteCodeAccessor.Get();
+    return CuteCodeAccessor.Get();
 }
 
 void FCuteCodeAccessModule::RegisterSettings()
 {
-	ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+    ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
 
-	if (SettingsModule)
-	{
-		ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings(
-			"Editor", "Plugins", "CuteCodeAccessor",
-			LOCTEXT("CuteCodeAccessSettingsName", "Cute Code Accessor"),
-			LOCTEXT("CuteCodeAccessSettingsDescription", "Edit Cute Code Accessor settings"),
-			GetMutableDefault<UCuteCodeEditorSettings>()
-		);
-	}
+    if (SettingsModule)
+    {
+        ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings(
+            "Editor", "Plugins", "CuteCodeAccessor",
+            LOCTEXT("CuteCodeAccessSettingsName", "Cute Code Accessor"),
+            LOCTEXT("CuteCodeAccessSettingsDescription", "Edit Cute Code Accessor settings"),
+            GetMutableDefault<UCuteCodeEditorSettings>()
+        );
+    }
 }
 
 void FCuteCodeAccessModule::UnregisterSettings()
 {
-	ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+    ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
 
-	if (SettingsModule)
-	{
-		SettingsModule->UnregisterSettings("Editor", "Plugins", "CuteCodeAccessor");
-	}
+    if (SettingsModule)
+    {
+        SettingsModule->UnregisterSettings("Editor", "Plugins", "CuteCodeAccessor");
+    }
 }
 
 #undef LOCTEXT_NAMESPACE

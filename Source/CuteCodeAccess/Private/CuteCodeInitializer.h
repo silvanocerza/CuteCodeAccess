@@ -7,20 +7,20 @@
 class FCuteCodeInitializer
 {
 public:
-	FCuteCodeInitializer(const FString& SolutionPath, const FString& ProjectName);
-	~FCuteCodeInitializer();
+    FCuteCodeInitializer(const FString& SolutionPath, const FString& ProjectName);
+    ~FCuteCodeInitializer();
 
-	void Run() const;
+    void Run() const;
 
 private:
-	void CreateProFile() const;
-	void CreatePriFiles() const;
-	void CreateProUserFile() const;
+    void CreateProFile() const;
+    void CreatePriFiles() const;
+    void CreateProUserFile() const;
 
-	FString SolutionPath;
-	FString ProjectName;
+    FString SolutionPath;
+    FString ProjectName;
 
-	FCuteCodeVCProjXmlCallback* VCProjXmlCallback;
+    FCuteCodeVCProjXmlCallback* VCProjXmlCallback;
 
-	void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
+    void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
 };

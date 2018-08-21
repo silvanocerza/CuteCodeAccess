@@ -6,103 +6,103 @@ DEFINE_LOG_CATEGORY_STATIC(LogCuteXmlCallbacks, Log, All);
 #define LOCTEXT_NAMESPACE "FCuteCodeXmlCallbacks"
 
 FCuteCodeVCProjXmlCallback::FCuteCodeVCProjXmlCallback()
-	: CurrentElementName{""}
+    : CurrentElementName{""}
 {
 
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
 {
-	if (CurrentElementName == "ClCompile" && AttributeName == FString{ "Include" })
-	{
-		Sources.Add(AttributeValue);
-	}
-	else if (CurrentElementName == "ClInclude" && AttributeName == FString{ "Include" })
-	{
-		Headers.Add(AttributeValue);
-	}
-	return true;
+    if (CurrentElementName == "ClCompile" && AttributeName == FString{ "Include" })
+    {
+        Sources.Add(AttributeValue);
+    }
+    else if (CurrentElementName == "ClInclude" && AttributeName == FString{ "Include" })
+    {
+        Headers.Add(AttributeValue);
+    }
+    return true;
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber)
 {
-	CurrentElementName = ElementName;
+    CurrentElementName = ElementName;
 
-	if (CurrentElementName == "NMakePreprocessorDefinitions")
-	{
-		Defines = ElementData;
-	}
-	else if (CurrentElementName == "NMakeIncludeSearchPath")
-	{
-		Includes = ElementData;
-	}
-	return true;
+    if (CurrentElementName == "NMakePreprocessorDefinitions")
+    {
+        Defines = ElementData;
+    }
+    else if (CurrentElementName == "NMakeIncludeSearchPath")
+    {
+        Includes = ElementData;
+    }
+    return true;
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessClose(const TCHAR* Element)
 {
-	CurrentElementName = "";
-	return true;
+    CurrentElementName = "";
+    return true;
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessComment(const TCHAR* Comment)
 {
-	return true;
+    return true;
 }
 
 bool FCuteCodeVCProjXmlCallback::ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber)
 {
-	return true;
+    return true;
 }
 
 FCuteCodeProfilesXmlCallback::FCuteCodeProfilesXmlCallback()
-	: CurrentElementData{ "" }
+    : CurrentElementData{ "" }
 {
-	const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
+    const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
 
-	if (Settings)
-	{
-		ExpectedKitName = Settings->UnrealKitName;
-	}
+    if (Settings)
+    {
+        ExpectedKitName = Settings->UnrealKitName;
+    }
 }
 
 bool FCuteCodeProfilesXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
 {
-	if (AttributeName == FString{"key"} && AttributeValue == FString{"PE.Profile.Id"})
-	{
-		KitUuid = CurrentElementData;
-	}
-	else if (AttributeName == FString{"key"}
-		&& AttributeValue == FString{"PE.Profile.Name"}
-		&& CurrentElementData == ExpectedKitName)
-	{
-		// We found our kit, no need to parse the rest of the file
-		return false;
-	}
-	return true;
+    if (AttributeName == FString{"key"} && AttributeValue == FString{"PE.Profile.Id"})
+    {
+        KitUuid = CurrentElementData;
+    }
+    else if (AttributeName == FString{"key"}
+        && AttributeValue == FString{"PE.Profile.Name"}
+        && CurrentElementData == ExpectedKitName)
+    {
+        // We found our kit, no need to parse the rest of the file
+        return false;
+    }
+    return true;
 }
 
 bool FCuteCodeProfilesXmlCallback::ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber)
 {
-	CurrentElementData = ElementData;
-	CurrentElement = ElementName;
-	return true;
+    CurrentElementData = ElementData;
+    CurrentElement = ElementName;
+    return true;
 }
 
 bool FCuteCodeProfilesXmlCallback::ProcessClose(const TCHAR* Element)
 {
-	CurrentElementData = "";
-	return true;
+    CurrentElementData = "";
+    return true;
 }
 
 bool FCuteCodeProfilesXmlCallback::ProcessComment(const TCHAR* Comment)
 {
-	return true;
+    return true;
 }
 
 bool FCuteCodeProfilesXmlCallback::ProcessXmlDeclaration(const TCHAR* ElementData, int32 XmlFileLineNumber)
 {
-	return true;
+    return true;
 }
 
 #undef LOCTEXT_NAMESPACE

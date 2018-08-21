@@ -7,19 +7,19 @@
 class FCuteCodeAccessModule : public IModuleInterface
 {
 public:
-	FCuteCodeAccessModule();
+    FCuteCodeAccessModule();
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
 
-	FCuteCodeAccessor& GetAccessor();
+    FCuteCodeAccessor& GetAccessor();
 
 protected:
-	void RegisterSettings();
-	void UnregisterSettings();
+    void RegisterSettings();
+    void UnregisterSettings();
 
 private:
 
-	TSharedRef<FCuteCodeAccessor> CuteCodeAccessor;
+    TSharedRef<FCuteCodeAccessor> CuteCodeAccessor;
 };
