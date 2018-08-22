@@ -77,6 +77,7 @@ void FCuteCodeAccessor::RefreshAvailability()
     }
     else
     {
+#if PLATFORM_WINDOWS
         FString IDEPath;
 
         FWindowsPlatformMisc::QueryRegKey(
@@ -93,9 +94,19 @@ void FCuteCodeAccessor::RefreshAvailability()
         {
             URL = Matcher.GetCaptureGroup(1);
         }
+#elif PLATFORM_MAC
+        NSURL* AppURL = [[NSWorkspace sharedWorkspace] URLForApplicationWithBundleIdentifier:@"org.qt-project.qtcreator"];
+        URL = FString{[AppURL path]};
+#endif
     }
 
-    if (!URL.IsEmpty() && FPaths::FileExists(URL))
+    // Applications on Mac OS are returned as directories so existence verification is different
+    if (!URL.IsEmpty() &&
+#if PLATFORM_WINDOWS
+        FPaths::FileExists(URL))
+#elif PLATFORM_MAC
+        FPaths::DirectoryExists(URL))
+#endif
     {
         Location.URL = FPaths::ConvertRelativePathToFull(URL);
         UE_LOG(LogCuteCodeAccessor, Log, TEXT("Qt Creator found at \"%s\""), *URL);

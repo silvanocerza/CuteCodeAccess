@@ -4,7 +4,9 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Runtime/XmlParser/Public/FastXml.h"
+#if PLATFORM_WINDOWS
 #include "Windows/WindowsPlatformMisc.h"
+#endif
 #include "IPluginManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
@@ -28,7 +30,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
     FFastXml::ParseXmlFile(
         VCProjXmlCallback,
         *VcxProjFile,
-        TEXT(""),
+        nullptr,
         nullptr,
         false,
         false,
@@ -159,15 +161,19 @@ void FCuteCodeInitializer::CreateProUserFile() const
             return;
         }
 
+#if PLATFORM_WINDOWS
         // Gets current user Roaming folder to find Qt Creator configurations
         int32 EnvVarLen = 512;
         TCHAR* EnvVar = new TCHAR[EnvVarLen];
-        FWindowsPlatformMisc::GetEnvironmentVariable(TEXT("APPDATA"), EnvVar, EnvVarLen);
 
-        FString RoamingDirectory = FString{ EnvVar };
+        FWindowsPlatformMisc::GetEnvironmentVariable(TEXT("APPDATA"), EnvVar, EnvVarLen);
+        FString ConfigDirectory = FString{ EnvVar };
+#elif PLATFORM_MAC
+        FString ConfigDirectory{"~/.config"};
+#endif
 
         FString QtCreatorProfileXmlFile = FPaths::Combine(
-            FString{ EnvVar },
+            ConfigDirectory,
             FString{ "QtProject/qtcreator/profiles.xml" }
         );
 
