@@ -10,6 +10,7 @@
 #include "Misc/ScopeLock.h"
 #include "Misc/UProjectInfo.h"
 #include "Misc/App.h"
+#include "Misc/FileHelper.h"
 
 #if PLATFORM_WINDOWS
 #include "Windows/AllowWindowsPlatformTypes.h"
@@ -129,8 +130,65 @@ bool FCuteCodeAccessor::OpenSourceFiles(const TArray<FString>& AbsoluteSourcePat
 
 bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePaths, const TArray<FString>& AvailableModules)
 {
-    // TODO: We might want to do things here
-    return true;
+    FString ProjectFile = FPaths::Combine(
+        FPaths::ProjectDir(),
+        INTERMEDIATE_PROJECTFILES,
+        FApp::GetProjectName() + FString(".pro")
+    );
+
+    // Files can't be added if .pro file doesn't exist
+    if (!FPaths::FileExists(ProjectFile))
+    {
+        return false;
+    }
+
+    // Gets project directory to get relative path from .pro file
+    FString ProjectDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir());
+    FPaths::NormalizeDirectoryName(ProjectDir);
+
+    // Separates Headers and Sources into different Arrays and formats paths
+    TArray<FString> Headers, Sources;
+    for (FString FilePath : AbsoluteSourcePaths)
+    {
+        FPaths::NormalizeDirectoryName(FilePath);
+        FilePath = FilePath.RightChop(ProjectDir.Len());
+
+        const FString& Extension = FPaths::GetExtension(FilePath).ToLower();
+        const FString& FormattedPath = FString::Format(TEXT("../..{0} \\"), {FilePath});
+        if (Extension.Contains(TEXT("c")))
+        {
+            Sources.Add(FormattedPath);
+        }
+        else if (Extension.Contains(TEXT("h")))
+        {
+            Headers.Add(FormattedPath);
+        }
+        else
+        {
+            UE_LOG(LogCuteCodeAccessor, Warning, TEXT("Ignoring unknown extension %s"), *Extension);
+        }
+    }
+
+    // Reads .pro file
+    TArray<FString> ProFileLines;
+    FFileHelper::LoadFileToStringArray(ProFileLines, *ProjectFile);
+
+    // Inserts Headers and Sources file paths
+    for (int32 i = 0; i < ProFileLines.Num(); i++)
+    {
+        const FString& Line = ProFileLines[i];
+        if (Line.Contains("HEADERS", ESearchCase::CaseSensitive))
+        {
+            ProFileLines.Insert(Headers, i + 1);
+        }
+        else if (Line.Contains("SOURCES", ESearchCase::CaseSensitive))
+        {
+            ProFileLines.Insert(Sources, i + 1);
+        }
+    }
+
+    // Saves updated .pro file
+    return FFileHelper::SaveStringArrayToFile(ProFileLines, *ProjectFile);
 }
 
 bool FCuteCodeAccessor::OpenFileAtLine(const FString& FullPath, int32 LineNumber, int32 ColumnNumber)
@@ -214,8 +272,9 @@ bool FCuteCodeAccessor::DoesSolutionExist() const
 
 bool FCuteCodeAccessor::SaveAllOpenDocuments() const
 {
-    // TODO
-    return true;
+    // There's no way that I know of to save all open files in Qt Creator
+    STUBBED("FCuteCodeAccessor::SaveAllOpenDocuments");
+    return false;
 }
 
 bool FCuteCodeAccessor::Launch(const TArray<FString>& InArgs)
