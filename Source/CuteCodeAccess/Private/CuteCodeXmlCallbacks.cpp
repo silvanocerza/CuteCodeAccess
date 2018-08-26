@@ -1,5 +1,6 @@
 #include "CuteCodeXmlCallbacks.h"
 #include "CuteCodeEditorSettings.h"
+#include "Misc/Paths.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteXmlCallbacks, Log, All);
 
@@ -15,11 +16,15 @@ bool FCuteCodeVCProjXmlCallback::ProcessAttribute(const TCHAR* AttributeName, co
 {
     if (CurrentElementName == "ClCompile" && AttributeName == FString{ "Include" })
     {
-        Sources.Add(AttributeValue);
+        FString FilePath{AttributeValue};
+        FPaths::NormalizeFilename(FilePath);
+        Sources.Add(FilePath);
     }
     else if (CurrentElementName == "ClInclude" && AttributeName == FString{ "Include" })
     {
-        Headers.Add(AttributeValue);
+        FString FilePath{AttributeValue};
+        FPaths::NormalizeFilename(FilePath);
+        Headers.Add(FilePath);
     }
     return true;
 }
