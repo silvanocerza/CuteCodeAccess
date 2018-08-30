@@ -7,7 +7,7 @@ class FCuteCodeVCProjXmlCallback : public IFastXmlCallback
 {
 public:
     FCuteCodeVCProjXmlCallback();
-    virtual ~FCuteCodeVCProjXmlCallback() {};
+    virtual ~FCuteCodeVCProjXmlCallback() {}
 
     bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override;
     bool ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber) override;
@@ -16,10 +16,10 @@ public:
     bool ProcessXmlDeclaration(const TCHAR * ElementData, int32 XmlFileLineNumber) override;
 
     // Getters
-    FString GetDefines() const { return Defines; };
-    FString GetIncludes() const { return Includes; };
-    TArray<FString> GetSources() const { return Sources; };
-    TArray<FString> GetHeaders() const { return Headers; };
+    FString GetDefines() const { return Defines; }
+    FString GetIncludes() const { return Includes; }
+    TArray<FString> GetSources() const { return Sources; }
+    TArray<FString> GetHeaders() const { return Headers; }
 
 private:
     FString CurrentElementName;
@@ -35,7 +35,7 @@ class FCuteCodeProfilesXmlCallback : public IFastXmlCallback
 {
 public:
     FCuteCodeProfilesXmlCallback();
-    virtual ~FCuteCodeProfilesXmlCallback() {};
+    virtual ~FCuteCodeProfilesXmlCallback() {}
 
     bool ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue) override;
     bool ProcessElement(const TCHAR* ElementName, const TCHAR* ElementData, int32 XmlFileLineNumber) override;

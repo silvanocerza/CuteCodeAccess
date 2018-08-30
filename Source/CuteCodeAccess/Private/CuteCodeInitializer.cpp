@@ -164,8 +164,6 @@ void FCuteCodeInitializer::CreateProUserFile() const
         TCHAR* EnvVar = new TCHAR[EnvVarLen];
         FWindowsPlatformMisc::GetEnvironmentVariable(TEXT("APPDATA"), EnvVar, EnvVarLen);
 
-        FString RoamingDirectory = FString{ EnvVar };
-
         FString QtCreatorProfileXmlFile = FPaths::Combine(
             FString{ EnvVar },
             FString{ "QtProject/qtcreator/profiles.xml" }
@@ -215,12 +213,19 @@ void FCuteCodeInitializer::CreateProUserFile() const
                 return;
             }
 
+            const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
+
+            // If parsing has reached end of file it means we have not found a valid kit
+            if (OutErrorLineNumber == QtCreatorProfileXmlLines.Num())
+            {
+                UE_LOG(LogCuteCodeInitializer, Error, TEXT("Kit %s has not been found in Qt Creator settings"), *Settings->UnrealKitName);
+                return;
+            }
+
             // Gets the templated pro.user file to configure build environment
             FString ContentDir = IPluginManager::Get().FindPlugin(TEXT("CuteCodeAccess"))->GetContentDir();
             FString ProjectProUserContent;
             FFileHelper::LoadFileToString(ProjectProUserContent, *(ContentDir / "project.pro.user"));
-
-            const UCuteCodeEditorSettings* Settings = GetDefault<UCuteCodeEditorSettings>();
 
             // Formats the pro.user file with correct values
             ProjectProUserContent = FString::Format(

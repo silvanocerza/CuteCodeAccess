@@ -13,8 +13,9 @@ public:
     virtual ~UCuteCodeEditorSettings() {}
 
     UPROPERTY(config, EditAnywhere, meta = (FilePathFilter = "exe"))
-    FFilePath QtCreatorPath;
+    FFilePath QtCreatorPath{""};
 
+    // Sets a default kit name to search in Qt Creator configs
     UPROPERTY(config, EditAnywhere)
-    FString UnrealKitName;
+    FString UnrealKitName = "Unreal Engine 4";
 };
