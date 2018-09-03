@@ -14,7 +14,10 @@ public:
 
 private:
     void CreateProFile() const;
-    void CreatePriFiles() const;
+    void CreateHeadersPriFile() const;
+    void CreateSourcesPriFile() const;
+    void CreateIncludesPriFile() const;
+    void CreateDefinesPriFile() const;
     void CreateProUserFile() const;
 
     FString SolutionPath;

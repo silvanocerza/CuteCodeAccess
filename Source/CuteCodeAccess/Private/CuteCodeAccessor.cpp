@@ -130,19 +130,26 @@ bool FCuteCodeAccessor::OpenSourceFiles(const TArray<FString>& AbsoluteSourcePat
 
 bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePaths, const TArray<FString>& AvailableModules)
 {
-    FString ProjectFile = FPaths::Combine(
+    FString HeadersPriFile = FPaths::Combine(
         FPaths::ProjectDir(),
         INTERMEDIATE_PROJECTFILES,
-        FApp::GetProjectName() + FString(".pro")
+        FString{"headers.pri"}
     );
 
-    // Files can't be added if .pro file doesn't exist
-    if (!FPaths::FileExists(ProjectFile))
+    FString SourcesPriFile = FPaths::Combine(
+        FPaths::ProjectDir(),
+        INTERMEDIATE_PROJECTFILES,
+        FString{"sources.pri"}
+    );
+
+
+    // Files can't be added if .pri files don't exist
+    if (!FPaths::FileExists(HeadersPriFile) && !FPaths::FileExists(SourcesPriFile))
     {
         return false;
     }
 
-    // Gets project directory to get relative path from .pro file
+    // Gets project absolute directory
     FString ProjectDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir());
     FPaths::NormalizeDirectoryName(ProjectDir);
 
@@ -154,7 +161,7 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
         FilePath = FilePath.RightChop(ProjectDir.Len());
 
         const FString& Extension = FPaths::GetExtension(FilePath).ToLower();
-        const FString& FormattedPath = FString::Format(TEXT("../..{0} \\"), {FilePath});
+        const FString& FormattedPath = FString::Format(TEXT("\"../..{0}\" \\"), {FilePath});
         if (Extension.Contains(TEXT("c")))
         {
             Sources.Add(FormattedPath);
@@ -169,26 +176,21 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
         }
     }
 
-    // Reads .pro file
-    TArray<FString> ProFileLines;
-    FFileHelper::LoadFileToStringArray(ProFileLines, *ProjectFile);
+    // Reads headers.pri file and appends new headers
+    TArray<FString> HeadersPriLines;
+    FFileHelper::LoadFileToStringArray(HeadersPriLines, *HeadersPriFile);
+    HeadersPriLines.Append(Headers);
 
-    // Inserts Headers and Sources file paths
-    for (int32 i = 0; i < ProFileLines.Num(); i++)
-    {
-        const FString& Line = ProFileLines[i];
-        if (Line.Contains("HEADERS", ESearchCase::CaseSensitive))
-        {
-            ProFileLines.Insert(Headers, i + 1);
-        }
-        else if (Line.Contains("SOURCES", ESearchCase::CaseSensitive))
-        {
-            ProFileLines.Insert(Sources, i + 1);
-        }
-    }
+    // Reads sources.pri file and appends new sources
+    TArray<FString> SourcesPriLines;
+    FFileHelper::LoadFileToStringArray(SourcesPriLines, *SourcesPriFile);
+    SourcesPriLines.Append(Sources);
 
-    // Saves updated .pro file
-    return FFileHelper::SaveStringArrayToFile(ProFileLines, *ProjectFile);
+    // Saves updated .pri files
+    bool bFilesWritten = FFileHelper::SaveStringArrayToFile(SourcesPriLines, *SourcesPriFile);
+    bFilesWritten = bFilesWritten && FFileHelper::SaveStringArrayToFile(HeadersPriLines, *HeadersPriFile);
+
+    return bFilesWritten;
 }
 
 bool FCuteCodeAccessor::OpenFileAtLine(const FString& FullPath, int32 LineNumber, int32 ColumnNumber)
