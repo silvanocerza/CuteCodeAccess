@@ -210,7 +210,6 @@ void FCuteCodeInitializer::CreateProUserFile() const
 
         if (FPaths::FileExists(QtCreatorProfileXmlFile))
         {
-            // TODO: Here parse xml and find configuration uuid
             FCuteCodeProfilesXmlCallback ProfileXmlCallback{};
 
             FText OutErrorMessage;
