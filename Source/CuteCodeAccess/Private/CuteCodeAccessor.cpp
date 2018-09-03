@@ -3,6 +3,7 @@
 #include "CuteCodeInitializer.h"
 #include "CuteCodeConstants.h"
 #include "CuteCodeEditorSettings.h"
+#include "Containers/Set.h"
 #include "Developer/SourceCodeAccess/Public/ISourceCodeAccessModule.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Modules/ModuleManager.h"
@@ -142,12 +143,23 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
         FString{"sources.pri"}
     );
 
+    FString IncludesPriFile = FPaths::Combine(
+        FPaths::ProjectDir(),
+        INTERMEDIATE_PROJECTFILES,
+        FString{"includes.pri"}
+    );
 
     // Files can't be added if .pri files don't exist
-    if (!FPaths::FileExists(HeadersPriFile) && !FPaths::FileExists(SourcesPriFile))
+    if (!FPaths::FileExists(HeadersPriFile) &&
+        !FPaths::FileExists(SourcesPriFile) &&
+        !FPaths::FileExists(IncludesPriFile))
     {
         return false;
     }
+
+    // List of possible include paths that might need to be added
+    // to includes.pri
+    TSet<FString> IncludePaths;
 
     // Gets project absolute directory
     FString ProjectDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir());
@@ -162,13 +174,22 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
 
         const FString& Extension = FPaths::GetExtension(FilePath).ToLower();
         const FString& FormattedPath = FString::Format(TEXT("\"../..{0}\" \\"), {FilePath});
+
+        // Saves include paths of new files in case they need to be added
+        // to includes.pri file
+        FString IncludePath = FPaths::GetPath(FilePath);
+        FPaths::NormalizeDirectoryName(IncludePath);
+        FString FormattedIncludePath = FString::Format(TEXT("\"../..{0}\" \\"), {IncludePath});
+
         if (Extension.Contains(TEXT("c")))
         {
             Sources.Add(FormattedPath);
+            IncludePaths.Add(FormattedIncludePath);
         }
         else if (Extension.Contains(TEXT("h")))
         {
             Headers.Add(FormattedPath);
+            IncludePaths.Add(FormattedIncludePath);
         }
         else
         {
@@ -186,9 +207,23 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
     FFileHelper::LoadFileToStringArray(SourcesPriLines, *SourcesPriFile);
     SourcesPriLines.Append(Sources);
 
-    // Saves updated .pri files
+    // Saves updated headers and sources .pri files
     bool bFilesWritten = FFileHelper::SaveStringArrayToFile(SourcesPriLines, *SourcesPriFile);
     bFilesWritten = bFilesWritten && FFileHelper::SaveStringArrayToFile(HeadersPriLines, *HeadersPriFile);
+
+    // Updates includes paths in includes.pri if necessary
+    TArray<FString> IncludesPriLines;
+    FFileHelper::LoadFileToStringArray(IncludesPriLines, *IncludesPriFile);
+    for (const FString& IncludePath : IncludePaths)
+    {
+        if (!IncludesPriLines.Contains(IncludePath))
+        {
+            IncludesPriLines.Add(IncludePath);
+        }
+    }
+
+    // Saves updated includes.pri file
+    bFilesWritten = FFileHelper::SaveStringArrayToFile(IncludesPriLines, *IncludesPriFile);
 
     return bFilesWritten;
 }
