@@ -18,16 +18,12 @@ public:
     // Getters
     FString GetDefines() const { return Defines; }
     FString GetIncludes() const { return Includes; }
-    TArray<FString> GetSources() const { return Sources; }
-    TArray<FString> GetHeaders() const { return Headers; }
 
 private:
     FString CurrentElementName;
 
     FString Defines;
     FString Includes;
-    TArray<FString> Sources;
-    TArray<FString> Headers;
 };
 
 /// Callback used when parsing Qt Creator profiles.xml

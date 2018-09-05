@@ -5,6 +5,7 @@
 #include "Misc/Paths.h"
 #include "Runtime/XmlParser/Public/FastXml.h"
 #include "Windows/WindowsPlatformMisc.h"
+#include "FileManagerGeneric.h"
 #include "IPluginManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
@@ -15,6 +16,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
     : SolutionPath{SolutionPath}
     , ProjectName{ProjectName}
     , VCProjXmlCallback{new FCuteCodeVCProjXmlCallback}
+    , ProjectVisitor{SolutionPath}
 {
     FText OutErrorMessage;
     int32 OutErrorLineNumber = -1;
@@ -28,7 +30,7 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
     FFastXml::ParseXmlFile(
         VCProjXmlCallback,
         *VcxProjFile,
-        TEXT(""),
+        nullptr,
         nullptr,
         false,
         false,
@@ -40,6 +42,19 @@ FCuteCodeInitializer::FCuteCodeInitializer(const FString& SolutionPath, const FS
     {
         UE_LOG(LogCuteCodeInitializer, Error, TEXT("Error parsing .vcxproj file at line: %d %s"),
             OutErrorLineNumber, *OutErrorMessage.ToString());
+    }
+
+    // Searches for project files recursively
+    FString SourcePath{SolutionPath + "/Source/"};
+    FPaths::NormalizeDirectoryName(SourcePath);
+    FFileManagerGeneric::Get().IterateDirectoryRecursively(*SourcePath, ProjectVisitor);
+
+    // Searches also for plugins files if directory exists
+    FString PluginsPath{SolutionPath + "/Plugins/"};
+    FPaths::NormalizeDirectoryName(PluginsPath);
+    if (FPaths::DirectoryExists(PluginsPath))
+    {
+        FFileManagerGeneric::Get().IterateDirectoryRecursively(*PluginsPath, ProjectVisitor);
     }
 }
 
@@ -95,7 +110,7 @@ void FCuteCodeInitializer::CreateHeadersPriFile() const
         "HEADERS += \\",
     }};
 
-    AppendFormattedStrings(HeadersPriLines, "\"{0}\" \\", VCProjXmlCallback->GetHeaders());
+    AppendFormattedStrings(HeadersPriLines, "\"{0}\" \\", ProjectVisitor.GetHeaders());
 
     FString HeadersPriFilePath = FPaths::Combine(
         SolutionPath,
@@ -116,7 +131,7 @@ void FCuteCodeInitializer::CreateSourcesPriFile() const
         "SOURCES += \\",
     }};
 
-    AppendFormattedStrings(SourcesPriLines, "\"{0}\" \\", VCProjXmlCallback->GetSources());
+    AppendFormattedStrings(SourcesPriLines, "\"{0}\" \\", ProjectVisitor.GetSources());
 
     FString SourcesPriFilePath = FPaths::Combine(
         SolutionPath,

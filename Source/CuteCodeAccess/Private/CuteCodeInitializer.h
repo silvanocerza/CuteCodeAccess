@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericPlatformFile.h"
 #include "CuteCodeXmlCallbacks.h"
+#include "CuteCodeVisitor.h"
 
 class FCuteCodeInitializer
 {
@@ -24,6 +25,7 @@ private:
     FString ProjectName;
 
     FCuteCodeVCProjXmlCallback* VCProjXmlCallback;
+    FCuteCodeVisitor ProjectVisitor;
 
     void AppendFormattedStrings(TArray<FString>& Array, const FString& Formatter, const TArray<FString>& ToAppend) const;
 };

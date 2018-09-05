@@ -14,18 +14,6 @@ FCuteCodeVCProjXmlCallback::FCuteCodeVCProjXmlCallback()
 
 bool FCuteCodeVCProjXmlCallback::ProcessAttribute(const TCHAR* AttributeName, const TCHAR* AttributeValue)
 {
-    if (CurrentElementName == "ClCompile" && AttributeName == FString{ "Include" })
-    {
-        FString FilePath{AttributeValue};
-        FPaths::NormalizeFilename(FilePath);
-        Sources.Add(FilePath);
-    }
-    else if (CurrentElementName == "ClInclude" && AttributeName == FString{ "Include" })
-    {
-        FString FilePath{AttributeValue};
-        FPaths::NormalizeFilename(FilePath);
-        Headers.Add(FilePath);
-    }
     return true;
 }
 
