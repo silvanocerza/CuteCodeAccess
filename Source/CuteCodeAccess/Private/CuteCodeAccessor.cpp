@@ -169,17 +169,17 @@ bool FCuteCodeAccessor::AddSourceFiles(const TArray<FString>& AbsoluteSourcePath
     TArray<FString> Headers, Sources;
     for (FString FilePath : AbsoluteSourcePaths)
     {
+        FilePath = "../.." + FilePath.RightChop(ProjectDir.Len());
         FPaths::NormalizeDirectoryName(FilePath);
-        FilePath = FilePath.RightChop(ProjectDir.Len());
 
         const FString& Extension = FPaths::GetExtension(FilePath).ToLower();
-        const FString& FormattedPath = FString::Format(TEXT("\"../..{0}\" \\"), {FilePath});
+        const FString& FormattedPath = FString::Format(TEXT("\"{0}\" \\"), {FilePath});
 
         // Saves include paths of new files in case they need to be added
         // to includes.pri file
         FString IncludePath = FPaths::GetPath(FilePath);
         FPaths::NormalizeDirectoryName(IncludePath);
-        FString FormattedIncludePath = FString::Format(TEXT("\"../..{0}\" \\"), {IncludePath});
+        FString FormattedIncludePath = FString::Format(TEXT("\"{0}\" \\"), {IncludePath});
 
         if (Extension.Contains(TEXT("c")))
         {

@@ -189,6 +189,11 @@ void FCuteCodeInitializer::CreateIncludesPriFile() const
     IncludesPriLines.Add("INCLUDEPATH += \\");
     AppendFormattedStrings(IncludesPriLines, "\"{0}\" \\", Includes);
 
+    for (FString IncludePath : Includes)
+    {
+        FPaths::NormalizeDirectoryName(IncludePath);
+    }
+
     FString IncludePriFilePaths = FPaths::Combine(
         SolutionPath,
         INTERMEDIATE_PROJECTFILES,
