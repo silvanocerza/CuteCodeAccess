@@ -23,6 +23,12 @@ bool FCuteCodeVisitor::Visit(const TCHAR* FilenameOrDirectory, bool bIsDirectory
         FString FileName = FString{FilenameOrDirectory}.Replace(*SolutionPath, TEXT("../.."));
         FPaths::NormalizeFilename(FileName);
 
+        // Project file is not inside a Source folder so we check it first
+        if (FileName.EndsWith(".uproject"))
+        {
+            OtherFiles.Add(FileName);
+        }
+
         FString SourcePath = FString{"/Source/"};
         FPaths::NormalizeFilename(SourcePath);
         // Skips directory not containing source files
@@ -31,7 +37,6 @@ bool FCuteCodeVisitor::Visit(const TCHAR* FilenameOrDirectory, bool bIsDirectory
             return true;
         }
 
-
         if (FileName.EndsWith(".h") || FileName.EndsWith(".hpp"))
         {
             Headers.Add(FileName);
@@ -39,6 +44,10 @@ bool FCuteCodeVisitor::Visit(const TCHAR* FilenameOrDirectory, bool bIsDirectory
         else if (FileName.EndsWith(".c") || FileName.EndsWith(".cpp"))
         {
             Sources.Add(FileName);
+        }
+        else if (FileName.EndsWith(".cs"))
+        {
+            OtherFiles.Add(FileName);
         }
     }
 

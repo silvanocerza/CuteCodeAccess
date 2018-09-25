@@ -15,10 +15,12 @@ public:
 
     TArray<FString> GetSources() const { return Sources; }
     TArray<FString> GetHeaders() const { return Headers; }
+    TArray<FString> GetOtherFiles() const { return OtherFiles; }
 
 private:
     FString SolutionPath;
 
     TArray<FString> Sources;
     TArray<FString> Headers;
+    TArray<FString> OtherFiles;
 };

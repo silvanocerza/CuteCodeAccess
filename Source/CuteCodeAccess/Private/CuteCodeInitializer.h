@@ -18,6 +18,7 @@ private:
     void CreateHeadersPriFile() const;
     void CreateSourcesPriFile() const;
     void CreateIncludesPriFile() const;
+    void CreateOthersPriFile() const;
     void CreateDefinesPriFile() const;
     void CreateProUserFile() const;
 
