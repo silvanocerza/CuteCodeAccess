@@ -23,10 +23,11 @@ bool FCuteCodeVisitor::Visit(const TCHAR* FilenameOrDirectory, bool bIsDirectory
         FString FileName = FString{FilenameOrDirectory}.Replace(*SolutionPath, TEXT("../.."));
         FPaths::NormalizeFilename(FileName);
 
-        // Project file is not inside a Source folder so we check it first
-        if (FileName.EndsWith(".uproject"))
+        // Project and plugin files might not be inside a Source folder so we check it first
+        if (FileName.EndsWith(".uproject") || FileName.EndsWith(".uplugin"))
         {
             OtherFiles.Add(FileName);
+            return true;
         }
 
         FString SourcePath = FString{"/Source/"};
