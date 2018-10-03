@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 #include "CuteCodeAccessModule.h"
 #include "CuteCodeEditorSettings.h"
 #include "Features/IModularFeatures.h"

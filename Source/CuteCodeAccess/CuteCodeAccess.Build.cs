@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 using Microsoft.Win32;
 
 namespace UnrealBuildTool.Rules

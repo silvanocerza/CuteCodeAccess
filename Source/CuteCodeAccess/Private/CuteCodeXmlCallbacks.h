@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 #pragma once
 
 #include "Runtime/XmlParser/Public/FastXml.h"

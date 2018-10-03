@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 #include "CuteCodeInitializer.h"
 #include "CuteCodeConstants.h"
 #include "CuteCodeEditorSettings.h"

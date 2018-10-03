@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 #include "CuteCodeAccessor.h"
 #include "CuteCodeAccessModule.h"
 #include "CuteCodeInitializer.h"

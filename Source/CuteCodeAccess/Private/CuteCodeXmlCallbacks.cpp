@@ -1,3 +1,5 @@
+// Copyright 2018 Silvano Cerza All Rights Reserved.
+
 #include "CuteCodeXmlCallbacks.h"
 #include "CuteCodeEditorSettings.h"
 #include "Misc/Paths.h"
