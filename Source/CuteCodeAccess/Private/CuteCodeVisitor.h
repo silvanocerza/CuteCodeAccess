@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericPlatformFile.h"
+#include "GenericPlatform/GenericPlatformFile.h"
 
 /// Visitor used to search for headers and sources, must be used
 /// with FileManager
