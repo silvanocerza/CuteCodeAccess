@@ -7,8 +7,8 @@
 #include "Misc/Paths.h"
 #include "Runtime/XmlParser/Public/FastXml.h"
 #include "Windows/WindowsPlatformMisc.h"
-#include "FileManagerGeneric.h"
-#include "IPluginManager.h"
+#include "HAL/FileManagerGeneric.h"
+#include "Interfaces/IPluginManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeInitializer, Log, All);
 

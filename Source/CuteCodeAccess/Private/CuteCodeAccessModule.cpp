@@ -4,8 +4,8 @@
 #include "CuteCodeEditorSettings.h"
 #include "Features/IModularFeatures.h"
 #include "Modules/ModuleManager.h"
-#include "ISettingsModule.h"
-#include "ISettingsSection.h"
+#include "Developer/Settings/Public/ISettingsModule.h"
+#include "Developer/Settings/Public/ISettingsSection.h"
 
 IMPLEMENT_MODULE(FCuteCodeAccessModule, CuteCodeAccess);
 

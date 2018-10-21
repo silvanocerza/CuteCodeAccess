@@ -1,7 +1,7 @@
 // Copyright 2018 Silvano Cerza All Rights Reserved.
 
 #include "CuteCodeVisitor.h"
-#include "Paths.h"
+#include "Misc/Paths.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCuteCodeVisitor, Log, All);
 
