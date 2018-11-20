@@ -1,7 +1,7 @@
 {
     "FileVersion": 3,
     "Version": 1,
-    "VersionName": "1.0.5",
+    "VersionName": "1.0.6",
     "FriendlyName": "Qt Creator Integration",
     "Description": "Open source code accessor for Qt Creator.",
     "Category": "Programming",
@@ -10,7 +10,7 @@
     "DocsURL": "https://github.com/alien1993/cutecodeaccess",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/d9db06ae35a24f50aae825d00bae9377",
     "SupportURL": "https://github.com/alien1993/cutecodeaccess/issues",
-    "EngineVersion": "4.20.0",
+    "EngineVersion": "4.21.0",
     "CanContainContent": false,
     "IsBetaVersion": false,
     "Installed": true,
