@@ -12,8 +12,7 @@ If configured correctly it generates a fully usable project already setup with s
 Setup
 =====
 
-Cute Code Accessor can be installed directly from the Unreal Engine Marketplace, here's its page.
-TODO: Add link
+Cute Code Accessor can be installed directly from the Unreal Engine Marketplace, [here's its page](https://www.unrealengine.com/marketplace/cute-code-accessor).
 
 If your prefer to use the latest version, and don't want to wait for an updated version on the Marketplace, you can clone it into your project or Unreal Engine Plugins folder.
 
