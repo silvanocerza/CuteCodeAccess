@@ -1,3 +1,5 @@
+# PROJECT IS NOT MAINTAINED ANYMORE
+
 ![Cute Logo](Resources/Icon128.png)
 
 Cute Code Accessor
